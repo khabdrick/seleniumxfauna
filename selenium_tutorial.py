@@ -2,6 +2,12 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
+from faunadb import query as q
+from faunadb.objects import Ref 
+from faunadb.client import FaunaClient 
+
+# to connect to our faunadb database 
+client = FaunaClient("fnAEKy6WEtACBcwfDfa0BSAZhhp7djiwQb-vlu0W") # copy and paste the secret key tou created above
 
 def get_url(search_text):
     """Generate a url from search text"""
@@ -61,7 +67,20 @@ def main(search_term):
     
     driver.close()
     
-    print(records)
+    for titles, prices in records:
+        client.query(
+        q.create(
+            q.collection("shoes"),{
+                "data":{"Titles":titles, "Prices":prices}
+            }
+        )
+        )
+
+        
+
+
+
+
 
 
 main("sneakers")
