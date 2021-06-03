@@ -1,10 +1,7 @@
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
-# Google Chrome
-driver = webdriver.Chrome('/home/muhammed/Desktop/dev/blog-repo/selenium-tutorial/chromedriver')
-
+import csv
 
 
 def get_url(search_text):
@@ -39,25 +36,33 @@ def extract_record(single_record):
     
     return result
 
+def main(search_term):
 
 
+    """Run main program routine"""
+    
+    # startup the webdriver
+    options=Options()
+    
+    options.headless = False #choose if we want the web browser to be open when doing the crawling 
+    # options.use_chromium = True
+    driver = webdriver.Chrome('/home/muhammed/Desktop/dev/blog-repo/selenium-tutorial/chromedriver')
+
+    records = []
+    url = get_url(search_term)
+    
+    for page in range(1, 5):
+        driver.get(url.format(page))
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        results = soup.find_all('div', {'data-component-type': 's-search-result'})
+        for item in results:
+            record = extract_record(item)
+            if record:
+                records.append(record)
+    
+    driver.close()
+    
+    print(records)
 
 
-
-
-
-
-
-
-
-
-records = []
-
-# get all search results
-results = soup.find_all('div', {'data-component-type': 's-search-result'})
-
-# extract data from each results
-for item in results:
-    records.append(extract_record(item))
-
-print(item)
+main("sneakers")
