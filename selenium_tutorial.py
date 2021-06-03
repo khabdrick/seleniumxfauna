@@ -5,6 +5,7 @@ from selenium import webdriver
 from faunadb import query as q
 from faunadb.objects import Ref 
 from faunadb.client import FaunaClient 
+import re
 
 # to connect to our faunadb database 
 client = FaunaClient("fnAEKy6WEtACBcwfDfa0BSAZhhp7djiwQb-vlu0W") # copy and paste the secret key tou created above
@@ -66,7 +67,7 @@ def main(search_term):
                 records.append(record)
     
     driver.close()
-    
+    # Store data
     for titles, prices in records:
         client.query(
         q.create(
@@ -76,11 +77,20 @@ def main(search_term):
         )
         )
 
-        
+# Retieve data
+all_sneakers = client.query(
+   q.paginate(
+       q.match(q.index("Allsneakers"))  #add the name of the index you created
+   ) 
+)
 
+all_sneakers_list = [all_sneakers["data"]]
+result = re.findall("\d+", str(all_sneakers_list)) #find all the number in the JSON, that will be the ids 
 
-
-
+for i in range(0, len(result)):
+    sneaker_details = client.query(q.get(q.ref(q.collection("shoes"), result[i])))
+    details_list = [sneaker_details["data"]]
+    print(details_list)
 
 
 main("sneakers")
