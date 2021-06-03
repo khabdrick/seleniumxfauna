@@ -1,7 +1,6 @@
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from selenium import webdriver
-import csv
 
 
 def get_url(search_text):
